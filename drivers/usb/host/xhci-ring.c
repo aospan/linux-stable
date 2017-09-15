@@ -3207,6 +3207,14 @@ int xhci_queue_bulk_tx(struct xhci_hcd *xhci, gfp_t mem_flags,
 	int sent_len, ret;
 	u32 field, length_field, remainder;
 	u64 addr, send_addr;
+	struct usb_device *udev = urb->dev;
+
+	// aospan: altera byteblaster workaround
+	// device ID 09fb:6001 Altera Blaster
+	// doesn't work under Linux without delay
+	if (udev && udev->descriptor.idProduct == 0x6001) {
+		mdelay(10);
+	}
 
 	ring = xhci_urb_to_transfer_ring(xhci, urb);
 	if (!ring)
